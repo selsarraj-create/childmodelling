@@ -21,7 +21,6 @@ export default function Home() {
           <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-brand-yellow to-brand-pink shadow-lg ring-2 ring-white" />
           <span className="text-2xl font-black text-white drop-shadow-md tracking-tight">TinyTalent<span className="text-brand-pink">.</span></span>
         </div>
-        <Button variant="ghost" size="sm" className="hidden md:flex bg-white/20 backdrop-blur-md text-white hover:bg-white/30 border-white/40">Parent Login</Button>
       </header>
 
       {/* Hero Section with Full Width Image */}
