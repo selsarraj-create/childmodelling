@@ -174,19 +174,12 @@ export default function Home() {
             <a href="#" className="hover:text-brand-pink transition-colors">Home</a>
             <a href="#" className="hover:text-brand-pink transition-colors">Success Stories</a>
             <a href="#" className="hover:text-brand-pink transition-colors">Apply Now</a>
-            <a href="#" className="hover:text-brand-pink transition-colors">Parent Login</a>
           </div>
 
           <div className="flex flex-col items-center md:items-end gap-4">
             <div className="flex gap-4">
-              <a href="#" className="h-10 w-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-brand-pink hover:text-white transition-all">
+              <a href="https://www.instagram.com/edgetalent.uk/" target="_blank" rel="noopener noreferrer" className="h-10 w-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-brand-pink hover:text-white transition-all">
                 <Instagram className="h-5 w-5" />
-              </a>
-              <a href="#" className="h-10 w-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-brand-blue hover:text-white transition-all">
-                <Facebook className="h-5 w-5" />
-              </a>
-              <a href="#" className="h-10 w-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-brand-yellow hover:text-white transition-all">
-                <Twitter className="h-5 w-5" />
               </a>
             </div>
             <p className="text-xs text-gray-400 flex items-center gap-1">
