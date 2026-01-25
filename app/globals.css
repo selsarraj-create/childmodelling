@@ -1,12 +1,38 @@
 @import "tailwindcss";
 
 :root {
-  --background: #F7F5F2; /* Soft warm white/beige base */
+  --background: #F7F5F2;
+  /* Soft warm white/beige base */
   --foreground: #171717;
-  
-  --brand-yellow: #FFD700;
-  --brand-blue: #7DF9FF;
-  --brand-pink: #FF69B4;
+
+  --brand-yellow: #FFDD00;
+  /* Brighter, more saturated yellow */
+  --brand-blue: #40E0D0;
+  /* Turquoise/Electric Blue */
+  --brand-pink: #FF1493;
+  /* Deep Pink */
+}
+
+@keyframes wiggle {
+
+  0%,
+  100% {
+    transform: rotate(-3deg);
+  }
+
+  50% {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 @theme inline {
@@ -15,9 +41,12 @@
   --color-brand-yellow: var(--brand-yellow);
   --color-brand-blue: var(--brand-blue);
   --color-brand-pink: var(--brand-pink);
-  
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --animate-wiggle: wiggle 1s ease-in-out infinite;
+  --animate-scroll: scroll 20s linear infinite;
 }
 
 @utility glass {
