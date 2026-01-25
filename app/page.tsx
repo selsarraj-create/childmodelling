@@ -37,6 +37,8 @@ export default function Home() {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent md:from-black/20" />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#F7F5F2]" />
+          {/* Mobile Scrim */}
+          <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/60 via-transparent to-transparent md:hidden" />
         </div>
 
         {/* Floating 3D Elements (Soft Focus) */}
@@ -49,20 +51,25 @@ export default function Home() {
           {/* Left Column: Copy */}
           <div className="space-y-6 text-center md:text-left md:max-w-xl md:pt-12">
 
-            {/* Wiggling Status Pill */}
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/90 backdrop-blur px-4 py-2 text-sm font-bold text-gray-900 shadow-xl ring-2 ring-brand-pink/50 animate-wiggle origin-left">
-              <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-              Accepting Applications for Ages 5-16
+            {/* Mobile Glassmorphism Card Wrapper */}
+            <div className="md:contents bg-white/30 backdrop-blur-md rounded-3xl p-6 md:p-0 md:bg-transparent md:backdrop-blur-none relative z-10 flex flex-col items-center md:block">
+
+              {/* Wiggling Status Pill */}
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/90 backdrop-blur px-4 py-2 text-sm font-bold text-gray-900 shadow-xl ring-2 ring-brand-pink/50 animate-wiggle origin-left mb-4 md:mb-0">
+                <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                Accepting Applications for Ages 5-16
+              </div>
+
+              <h1 className="text-[2.25rem] md:text-5xl font-black tracking-tight text-white drop-shadow-none shadow-pink-200/50 sm:text-6xl lg:text-7xl leading-tight md:leading-[1.1] mb-4 md:mb-0 [text-shadow:_0_4px_12px_rgb(251_207_232_/_0.5)]">
+                Empowering the <br className="hidden md:block" />
+                <span className="text-brand-yellow drop-shadow-md">Next Generation</span> of Talent.
+              </h1>
+
+              <p className="text-lg font-medium text-white/90 drop-shadow-md lg:text-xl md:max-w-md">
+                We bridge the gap between young potential and professional opportunity. The UK's most trusted agency.
+              </p>
+
             </div>
-
-            <h1 className="text-5xl font-black tracking-tight text-white drop-shadow-lg sm:text-6xl lg:text-7xl leading-[1.1]">
-              Empowering the <br />
-              <span className="text-brand-yellow drop-shadow-md">Next Generation</span> of Talent.
-            </h1>
-
-            <p className="text-lg font-medium text-white/90 drop-shadow-md lg:text-xl md:max-w-md">
-              We bridge the gap between young potential and professional opportunity. The UK's most trusted agency.
-            </p>
 
             {/* No Upfront Fees Badge */}
             <div className="flex flex-wrap gap-4 justify-center md:justify-start">
