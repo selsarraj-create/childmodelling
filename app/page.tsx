@@ -66,7 +66,7 @@ export default function Home() {
               </h1>
 
               <p className="text-lg font-medium text-white/90 drop-shadow-md lg:text-xl md:max-w-md">
-                We bridge the gap between young potential and professional opportunity. The UK's most trusted agency.
+                We bridge the gap between young potential and professional opportunity. London's Leading Model Support Service.
               </p>
 
             </div>
