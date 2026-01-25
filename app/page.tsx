@@ -34,14 +34,8 @@ export default function Home() {
         </div>
 
         {/* Floating 3D Elements */}
-        <div className="absolute top-[15%] left-[5%] z-10 animate-bounce duration-[3000ms] hidden md:block">
-          <Image src="/star-3d.png" alt="3D Star" width={120} height={120} className="drop-shadow-2xl hover:scale-110 transition-transform cursor-pointer" />
-        </div>
         <div className="absolute bottom-[20%] right-[10%] z-10 animate-pulse duration-[4000ms] hidden lg:block">
           <Image src="/block-3d.png" alt="3D Block" width={140} height={140} className="drop-shadow-2xl hover:rotate-12 transition-transform cursor-pointer" />
-        </div>
-        <div className="absolute top-[20%] right-[30%] z-10 animate-bounce duration-[3500ms] hidden lg:block">
-          <Image src="/camera-3d.png" alt="3D Camera" width={100} height={100} className="drop-shadow-2xl hover:-rotate-6 transition-transform cursor-pointer" />
         </div>
 
         <div className="relative z-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-full flex flex-col md:flex-row items-center justify-center md:items-start md:justify-between gap-8 pt-12 md:pt-24">
