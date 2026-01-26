@@ -11,6 +11,7 @@ import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { ImageUpload } from './ImageUpload'
 import { cn } from '@/lib/utils'
+import { supabase } from '@/lib/supabase'
 
 const formSchema = z.object({
     firstName: z.string().min(2, "First name is too short"),
@@ -66,10 +67,54 @@ export function ApplicationForm() {
     }
 
     const onSubmit = async (data: FormValues) => {
-        // Simulate API call
-        console.log("Submitting form:", data)
-        await new Promise(resolve => setTimeout(resolve, 1500))
-        alert("Application Received! We will be in touch.")
+        try {
+            console.log("Submitting to Supabase...", data)
+
+            // 1. Upload Image to Supabase Storage
+            const file = data.image
+            const fileExt = file.name.split('.').pop()
+            const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
+            const filePath = `${fileName}`
+
+            // Ensure bucket exists or handle error (Assuming bucket 'applicants' exists per plan)
+            const { error: uploadError } = await supabase.storage
+                .from('applicants')
+                .upload(filePath, file)
+
+            if (uploadError) {
+                console.error("Upload error:", uploadError)
+                throw new Error("Failed to upload image")
+            }
+
+            // 2. Get Public URL
+            const { data: { publicUrl } } = supabase.storage
+                .from('applicants')
+                .getPublicUrl(filePath)
+
+            // 3. Insert Data into Table
+            const { error: dbError } = await supabase
+                .from('applications')
+                .insert({
+                    first_name: data.firstName,
+                    last_name: data.lastName,
+                    age: parseInt(data.age),
+                    phone: data.phone,
+                    post_code: data.postCode,
+                    image_url: publicUrl,
+                    status: 'new'
+                })
+
+            if (dbError) {
+                console.error("Database error:", dbError)
+                throw new Error("Failed to save application")
+            }
+
+            alert("Application Received! We will be in touch.")
+
+        } catch (error) {
+            console.error("Submission failed:", error)
+            alert("Something went wrong. Please try again.")
+        }
     }
 
     const imageValue = watch('image')
