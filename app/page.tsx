@@ -6,7 +6,7 @@ import { InfinitePortfolio } from '@/components/InfinitePortfolio'
 import { StarQualityChecklist } from '@/components/StarQualityChecklist'
 import { EthicalModelling } from '@/components/EthicalModelling'
 import { AgeDivisions } from '@/components/AgeDivisions'
-import { Star, Instagram, Facebook, Twitter, Heart, CheckCircle2, GraduationCap } from 'lucide-react'
+import { Star, Facebook, Twitter, Heart, CheckCircle2, GraduationCap } from 'lucide-react'
 import Image from 'next/image'
 
 export default function Home() {
@@ -163,11 +163,7 @@ export default function Home() {
             <p className="text-sm text-gray-500 font-medium max-w-xs text-center md:text-left">
               Connecting cuteness with confidence since 2010. The UK's favorite child modelling family.
             </p>
-            {/* New Trust Info */}
-            <div className="flex flex-col gap-1 text-xs text-gray-400 font-medium text-center md:text-left">
-              <p>📍 123 High Street, Kensington, London, W8 5SA</p>
-              <p>📧 support@tinytalent.co.uk</p>
-            </div>
+            {/* New Trust Info - Removed */}
           </div>
 
           <div className="flex gap-8 text-sm font-bold text-gray-600">
@@ -178,9 +174,7 @@ export default function Home() {
 
           <div className="flex flex-col items-center md:items-end gap-4">
             <div className="flex gap-4">
-              <a href="https://www.instagram.com/edgetalent.uk/" target="_blank" rel="noopener noreferrer" className="h-10 w-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 hover:bg-brand-pink hover:text-white transition-all">
-                <Instagram className="h-5 w-5" />
-              </a>
+              {/* Social Icons Removed */}
             </div>
             <p className="text-xs text-gray-400 flex items-center gap-1">
               Made with <Heart className="h-3 w-3 text-red-400 fill-current" /> in London. © 2026
