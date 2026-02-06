@@ -26,6 +26,11 @@ export default function Dashboard() {
     const [dateFrom, setDateFrom] = useState('')
     const [dateTo, setDateTo] = useState('')
 
+    // Selection & Sending State
+    const [selectedLeads, setSelectedLeads] = useState<Set<string>>(new Set())
+    const [isSending, setIsSending] = useState(false)
+    const [sendProgress, setSendProgress] = useState('')
+
     const fetchLeads = async () => {
         setLoading(true)
         let query = supabase
@@ -37,7 +42,6 @@ export default function Dashboard() {
             query = query.gte('created_at', new Date(dateFrom).toISOString())
         }
         if (dateTo) {
-            // Add one day to include the end date fully
             const endDate = new Date(dateTo)
             endDate.setDate(endDate.getDate() + 1)
             query = query.lt('created_at', endDate.toISOString())
@@ -55,7 +59,77 @@ export default function Dashboard() {
 
     useEffect(() => {
         fetchLeads()
-    }, [dateFrom, dateTo]) // Re-fetch when dates change
+    }, [dateFrom, dateTo])
+
+    // --- Selection Logic ---
+    const toggleSelectAll = () => {
+        if (selectedLeads.size === leads.length) {
+            setSelectedLeads(new Set())
+        } else {
+            setSelectedLeads(new Set(leads.map(l => l.id)))
+        }
+    }
+
+    const toggleSelectOne = (id: string) => {
+        const newSet = new Set(selectedLeads)
+        if (newSet.has(id)) {
+            newSet.delete(id)
+        } else {
+            newSet.add(id)
+        }
+        setSelectedLeads(newSet)
+    }
+
+    // --- Email Sending Logic ---
+    const sendSingleEmail = async (lead: Application) => {
+        try {
+            const res = await fetch('/api/send-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    firstName: lead.first_name,
+                    lastName: lead.last_name,
+                    email: lead.email,
+                    phone: lead.phone,
+                    age: lead.age,
+                    postCode: lead.post_code,
+                    imageUrl: lead.image_url
+                })
+            })
+            if (!res.ok) throw new Error("Failed to send")
+            return true
+        } catch (error) {
+            console.error(error)
+            return false
+        }
+    }
+
+    const handleBulkResend = async () => {
+        if (!confirm(`Are you sure you want to resend emails to ${selectedLeads.size} applicants?`)) return
+
+        setIsSending(true)
+        const leadsToSend = leads.filter(l => selectedLeads.has(l.id))
+        let count = 0
+        let successCount = 0
+
+        for (const lead of leadsToSend) {
+            count++
+            setSendProgress(`Sending ${count} of ${leadsToSend.length}...`)
+
+            const success = await sendSingleEmail(lead)
+            if (success) successCount++
+
+            // Delay 5 seconds between sends (if not the last one)
+            if (count < leadsToSend.length) {
+                await new Promise(resolve => setTimeout(resolve, 5000))
+            }
+        }
+
+        setIsSending(false)
+        setSendProgress('')
+        alert(`Finished! Successfully sent ${successCount} of ${leadsToSend.length} emails.`)
+        setSelectedLeads(new Set()) // Clear selection
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 p-4 md:p-8 font-sans">
@@ -68,6 +142,31 @@ export default function Dashboard() {
                         <p className="text-gray-500 font-medium">Manage and view incoming talent applications.</p>
                     </div>
                     <div className="flex items-center gap-2">
+                        {/* Bulk Action Bar */}
+                        {selectedLeads.size > 0 && (
+                            <div className="flex items-center gap-2 mr-4 bg-brand-blue/10 px-3 py-2 rounded-xl animate-in fade-in slide-in-from-right-4">
+                                <span className="text-sm font-bold text-brand-blue">{selectedLeads.size} Selected</span>
+                                <Button
+                                    onClick={handleBulkResend}
+                                    disabled={isSending}
+                                    variant="default"
+                                    className="bg-brand-blue text-white hover:bg-brand-blue/90 h-8 text-xs"
+                                >
+                                    {isSending ? (
+                                        <span className="flex items-center gap-2">
+                                            <Clock className="w-3 h-3 animate-spin" />
+                                            {sendProgress}
+                                        </span>
+                                    ) : (
+                                        <>
+                                            <Search className="w-3 h-3 mr-1" /> {/* Using Search as placeholder icon or replace with Mail via import */}
+                                            Resend Bulk
+                                        </>
+                                    )}
+                                </Button>
+                            </div>
+                        )}
+
                         <div className="bg-white p-2 rounded-xl shadow-sm border border-gray-200 flex items-center gap-2">
                             <span className="text-xs font-bold text-gray-400 uppercase tracking-widest pl-2">Filter Date</span>
                             <input
@@ -88,7 +187,7 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* Stats Row (Optional Placeholder) */}
+                {/* Stats Row */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
                         <p className="text-xs font-bold text-gray-400 uppercase">Total Leads</p>
@@ -102,25 +201,42 @@ export default function Dashboard() {
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-gray-50/50 border-b border-gray-100">
+                                    <th className="p-4 w-12 text-center">
+                                        <input
+                                            type="checkbox"
+                                            className="rounded border-gray-300 text-brand-blue focus:ring-brand-blue"
+                                            checked={leads.length > 0 && selectedLeads.size === leads.length}
+                                            onChange={toggleSelectAll}
+                                        />
+                                    </th>
                                     <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-wider">Applicant</th>
                                     <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-wider">Age</th>
                                     <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-wider">Contact</th>
                                     <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-wider">Submitted</th>
                                     <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-wider">Image</th>
+                                    <th className="p-4 text-xs font-black text-gray-400 uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
                                 {loading ? (
                                     <tr>
-                                        <td colSpan={5} className="p-8 text-center text-gray-500">Loading leads...</td>
+                                        <td colSpan={7} className="p-8 text-center text-gray-500">Loading leads...</td>
                                     </tr>
                                 ) : leads.length === 0 ? (
                                     <tr>
-                                        <td colSpan={5} className="p-8 text-center text-gray-500">No leads found for this period.</td>
+                                        <td colSpan={7} className="p-8 text-center text-gray-500">No leads found for this period.</td>
                                     </tr>
                                 ) : (
                                     leads.map((lead) => (
-                                        <tr key={lead.id} className="hover:bg-gray-50 transition-colors group">
+                                        <tr key={lead.id} className={`hover:bg-gray-50 transition-colors group ${selectedLeads.has(lead.id) ? 'bg-blue-50/50' : ''}`}>
+                                            <td className="p-4 text-center">
+                                                <input
+                                                    type="checkbox"
+                                                    className="rounded border-gray-300 text-brand-blue focus:ring-brand-blue"
+                                                    checked={selectedLeads.has(lead.id)}
+                                                    onChange={() => toggleSelectOne(lead.id)}
+                                                />
+                                            </td>
                                             <td className="p-4">
                                                 <div className="font-bold text-gray-900">{lead.first_name} {lead.last_name}</div>
                                                 <div className="text-xs text-gray-400 font-mono">{lead.id.slice(0, 8)}...</div>
@@ -133,6 +249,7 @@ export default function Dashboard() {
                                             <td className="p-4">
                                                 <div className="text-sm font-medium text-gray-700">{lead.phone}</div>
                                                 <div className="text-xs text-gray-400">{lead.post_code}</div>
+                                                <div className="text-xs text-brand-pink truncate max-w-[150px]">{lead.email}</div>
                                             </td>
                                             <td className="p-4">
                                                 <div className="text-sm text-gray-600 font-medium">
@@ -155,6 +272,21 @@ export default function Dashboard() {
                                                 ) : (
                                                     <span className="text-xs text-gray-400 italic">No image</span>
                                                 )}
+                                            </td>
+                                            <td className="p-4">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => {
+                                                        if (confirm(`Resend email for ${lead.first_name}?`)) {
+                                                            sendSingleEmail(lead).then(ok => ok && alert("Email sent!"))
+                                                        }
+                                                    }}
+                                                    className="text-gray-400 hover:text-brand-blue"
+                                                    title="Resend Email"
+                                                >
+                                                    <Search className="w-4 h-4" /> {/* Placeholder, should be Send/Mail */}
+                                                </Button>
                                             </td>
                                         </tr>
                                     ))
