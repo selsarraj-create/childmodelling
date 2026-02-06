@@ -88,7 +88,7 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
                             </div>
                             <div className="space-y-1">
                                 <p className="text-base font-bold text-gray-900">
-                                    Tap to take a photo
+                                    Tap to upload or take a photo
                                 </p>
                                 <p className="text-xs text-gray-500 max-w-[200px] mx-auto leading-tight">
                                     Snap a clear, front-facing photo in natural light—no filters or group shots needed!
