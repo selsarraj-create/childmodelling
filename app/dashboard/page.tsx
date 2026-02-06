@@ -13,6 +13,7 @@ type Application = {
     created_at: string
     first_name: string
     last_name: string
+    email: string
     age: number
     phone: string
     post_code: string
