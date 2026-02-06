@@ -29,7 +29,7 @@ export async function POST(request: Request) {
         const mailOptions = {
             from: process.env.SMTP_SENDER || 'no-reply@tinytalent.uk', // Ensure this sender is verified in SMTP2GO
             to: process.env.ADMIN_EMAIL || 'admin@tinytalent.uk', // Where to send the lead
-            subject: `New Application: ${firstName} ${lastName}`,
+            subject: `${firstName} ${lastName} - EdgeKidLead`,
             html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #2D3748;">New Model Application Received</h2>
