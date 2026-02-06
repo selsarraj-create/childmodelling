@@ -56,7 +56,7 @@ export default function Home() {
               {/* Wiggling Status Pill */}
               <div className="inline-flex items-center gap-2 rounded-full bg-white/90 backdrop-blur px-4 py-2 text-sm font-bold text-gray-900 shadow-xl ring-2 ring-brand-pink/50 animate-wiggle origin-left mb-4 md:mb-0">
                 <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                Accepting Applications for Ages 5-17
+                Accepting Applications for Ages 3-17
               </div>
 
               <h1 className="text-[2.25rem] md:text-5xl font-black tracking-tight text-white drop-shadow-none shadow-pink-200/50 sm:text-6xl lg:text-7xl leading-tight md:leading-[1.1] mb-4 md:mb-0 [text-shadow:_0_4px_12px_rgb(251_207_232_/_0.5)]">
