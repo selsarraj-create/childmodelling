@@ -4,8 +4,9 @@ import React from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { Lock, ShieldCheck, ChevronRight, User, MapPin, Phone, Calendar } from 'lucide-react'
+import { Lock, ShieldCheck, ChevronRight, User, MapPin, Phone, Calendar, Mail } from 'lucide-react'
 import { motion } from 'framer-motion'
+import heic2any from 'heic2any'
 
 import { Input } from './ui/input'
 import { Button } from './ui/button'
@@ -16,6 +17,7 @@ import { supabase } from '@/lib/supabase'
 const formSchema = z.object({
     firstName: z.string().min(2, "First name is too short"),
     lastName: z.string().min(2, "Last name is too short"),
+    email: z.string().email("Please enter a valid email"),
     age: z.string().regex(/^\d+$/, "Age must be a number"),
     phone: z.string().min(10, "Please enter a valid phone number"),
     postCode: z.string().min(5, "Please enter a valid Post Code"),
@@ -41,7 +43,6 @@ export function ApplicationForm() {
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let val = e.target.value.replace(/\D/g, '')
         if (val.length > 11) val = val.slice(0, 11)
-        // Format as 07XXX XXXXXX (UK style basic) or just generic spacing
         if (val.length > 5) {
             val = val.slice(0, 5) + ' ' + val.slice(5)
         }
@@ -50,10 +51,7 @@ export function ApplicationForm() {
 
     const handlePostCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '')
-        // Simple UK formatting (adding space before last 3 chars if length > 4)
-        if (val.length > 4) { // e.g. SW1A1AA -> SW1A 1AA
-            // This is a naive formatter, but valid for requirement "spacing as user types"
-            // A robust one would need more logic, let's keep it simple: max 7 chars strict
+        if (val.length > 4) {
             if (val.length > 7) val = val.slice(0, 7)
             const last3 = val.slice(-3)
             const prefix = val.slice(0, -3)
@@ -61,42 +59,74 @@ export function ApplicationForm() {
                 val = `${prefix} ${last3}`
             }
         }
-
-        // Better simple approach for now: just uppercase
         setValue('postCode', val, { shouldValidate: true })
     }
 
     const onSubmit = async (data: FormValues) => {
         try {
+            console.log("Checking for duplicates...")
+
+            // 0. Check for Duplicates
+            const { count } = await supabase
+                .from('applications')
+                .select('id', { count: 'exact', head: true })
+                .or(`email.eq.${data.email},phone.eq.${data.phone}`)
+
+            if (count && count > 0) {
+                alert("An application with this email or phone already exists!")
+                return
+            }
+
             console.log("Submitting to Supabase...", data)
 
-            // 1. Upload Image to Supabase Storage
-            const file = data.image
-            const fileExt = file.name.split('.').pop()
+            // 1. Handle HEIC Conversion if needed
+            let fileToUpload = data.image
+            if (fileToUpload.name.toLowerCase().endsWith('.heic') || fileToUpload.type === 'image/heic') {
+                console.log("Converting HEIC to JPEG...")
+                try {
+                    const convertedBlob = await heic2any({
+                        blob: fileToUpload,
+                        toType: "image/jpeg",
+                        quality: 0.8
+                    }) as Blob
+
+                    // Handle array or single blob
+                    const finalBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob
+
+                    fileToUpload = new File([finalBlob], fileToUpload.name.replace(/\.heic$/i, '.jpg'), {
+                        type: 'image/jpeg'
+                    })
+                } catch (e) {
+                    console.error("HEIC conversion failed", e)
+                    // Fallback to original if conversion fails, though browsers might not display it
+                }
+            }
+
+            // 2. Upload Image
+            const fileExt = fileToUpload.name.split('.').pop()
             const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
             const filePath = `${fileName}`
 
-            // Ensure bucket exists or handle error (Assuming bucket 'leads' exists per plan)
             const { error: uploadError } = await supabase.storage
                 .from('leads')
-                .upload(filePath, file)
+                .upload(filePath, fileToUpload)
 
             if (uploadError) {
                 console.error("Upload error:", uploadError)
                 throw new Error("Failed to upload image")
             }
 
-            // 2. Get Public URL
             const { data: { publicUrl } } = supabase.storage
                 .from('leads')
                 .getPublicUrl(filePath)
 
-            // 3. Insert Data into Table
+            // 3. Insert Data
             const { error: dbError } = await supabase
                 .from('applications')
                 .insert({
                     first_name: data.firstName,
                     last_name: data.lastName,
+                    email: data.email,
                     age: parseInt(data.age),
                     phone: data.phone,
                     post_code: data.postCode,
@@ -109,7 +139,7 @@ export function ApplicationForm() {
                 throw new Error("Failed to save application")
             }
 
-            // Track Conversion in GTM
+            // Track Conversion
             if (typeof window !== 'undefined') {
                 (window as any).dataLayer = (window as any).dataLayer || [];
                 (window as any).dataLayer.push({
@@ -169,6 +199,18 @@ export function ApplicationForm() {
                     </div>
                 </div>
 
+                {/* Email Field */}
+                <div className="space-y-1">
+                    <Input
+                        {...register('email')}
+                        type="email"
+                        placeholder="Parent Email Address"
+                        icon={<Mail className="w-5 h-5" />}
+                        className={cn("bg-white/70", errors.email && "border-red-500 ring-red-500")}
+                    />
+                    {errors.email && <p className="ml-1 text-xs font-bold text-red-500">{errors.email.message}</p>}
+                </div>
+
                 {/* Age & PostCode Row */}
                 <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1">
@@ -182,24 +224,13 @@ export function ApplicationForm() {
                                     errors.age && "border-red-500 ring-red-500"
                                 )}
                                 {...register('age')}
-                                defaultValue="7" // Default to typical starting age
+                                defaultValue="5"
                             >
                                 <option value="" disabled>Age</option>
-                                <optgroup label="Primary (5-10)">
-                                    {[5, 6, 7, 8, 9, 10].map((age) => (
-                                        <option key={age} value={age}>{age} Years</option>
-                                    ))}
-                                </optgroup>
-                                <optgroup label="Secondary (11-17)">
-                                    {[11, 12, 13, 14, 15, 16, 17].map((age) => (
-                                        <option key={age} value={age}>{age} Years</option>
-                                    ))}
-                                </optgroup>
-                                <optgroup label="Other">
-                                    {[0, 1, 2, 3, 4, 18].map((age) => (
-                                        <option key={age} value={age}>{age} Years</option>
-                                    ))}
-                                </optgroup>
+                                {/* Ages 3 to 17 */}
+                                {Array.from({ length: 15 }, (_, i) => i + 3).map((age) => (
+                                    <option key={age} value={age}>{age} Years</option>
+                                ))}
                             </select>
                             <ChevronRight className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-gray-500" />
                         </div>
@@ -234,7 +265,7 @@ export function ApplicationForm() {
                 {/* Image Upload */}
                 <div className="space-y-1">
                     <label className="ml-1 text-sm font-bold text-gray-700">Photos (Headshot + Full Length)</label>
-                    <p className="ml-1 text-xs text-gray-500 mb-1">Showcase personality! Natural light prefered.</p>
+                    <p className="ml-1 text-xs text-gray-500 mb-1">We accept JPG, PNG & HEIC (iPhone).</p>
                     <ImageUpload
                         value={imageValue}
                         onChange={(file) => setValue('image', file as any, { shouldValidate: true })}
@@ -252,7 +283,7 @@ export function ApplicationForm() {
                         variant="primary"
                         size="lg"
                     >
-                        {isSubmitting ? "Sending..." : "Submit Application"}
+                        {isSubmitting ? "Sending Application..." : "Submit Application"}
                     </Button>
 
                     <div className="mt-3 flex items-center justify-center gap-2 text-xs font-medium text-gray-500">
