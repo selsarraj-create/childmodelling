@@ -242,7 +242,7 @@ export function ApplicationForm() {
                 </div>
                 <h2 className="text-3xl font-black text-gray-900 mb-4 tracking-tight">Application Received!</h2>
                 <p className="text-gray-500 max-w-sm mx-auto mb-8 text-lg font-medium">
-                    Thank you for applying to TinyTalent. Your application is now with our casting team. We'll be in touch shortly!
+                    Thank you for applying to TinyTalent. Your application is now with our booking team. We'll be in touch shortly!
                 </p>
                 <div className="bg-white/50 p-4 rounded-2xl border border-white/60 mb-8 max-w-xs w-full">
                     <p className="text-sm text-gray-400 font-bold uppercase tracking-wider mb-1">What's Next?</p>
