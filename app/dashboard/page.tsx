@@ -150,7 +150,7 @@ export default function Dashboard() {
                                 <Button
                                     onClick={handleBulkResend}
                                     disabled={isSending}
-                                    variant="default"
+                                    variant="primary"
                                     className="bg-brand-blue text-white hover:bg-brand-blue/90 h-8 text-xs"
                                 >
                                     {isSending ? (
