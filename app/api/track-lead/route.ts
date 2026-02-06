@@ -15,7 +15,7 @@ export async function POST(request: Request) {
 
     try {
         const body = await request.json();
-        const { email, phone, firstName, lastName, age, postCode, eventId, sourceUrl } = body;
+        const { email, phone, firstName, lastName, childName, gender, age, postCode, eventId, sourceUrl } = body;
 
         const currentTimestamp = Math.floor(Date.now() / 1000);
 
@@ -40,6 +40,8 @@ export async function POST(request: Request) {
                     action_source: 'website',
                     user_data: userData,
                     custom_data: {
+                        child_name: childName,
+                        gender: gender,
                         age: age,
                         currency: 'GBP',
                         value: 0

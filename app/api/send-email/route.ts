@@ -4,10 +4,10 @@ import nodemailer from 'nodemailer';
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { firstName, lastName, email, phone, age, postCode, imageUrl } = body;
+        const { childName, gender, firstName, lastName, email, phone, age, postCode, imageUrl } = body;
 
         // Validate required fields
-        if (!firstName || !lastName || !email || !phone) {
+        if (!childName || !email || !phone) {
             return NextResponse.json(
                 { error: 'Missing required fields' },
                 { status: 400 }
@@ -29,12 +29,18 @@ export async function POST(request: Request) {
         const mailOptions = {
             from: process.env.SMTP_SENDER || 'no-reply@tinytalent.uk', // Ensure this sender is verified in SMTP2GO
             to: process.env.ADMIN_EMAIL || 'admin@tinytalent.uk', // Where to send the lead
-            subject: `${firstName} ${lastName} - EdgeKidLead`,
+            subject: `${childName} (${gender}) - EdgeKidLead`,
             html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #2D3748;">New Model Application Received</h2>
-          <p><strong>Name:</strong> ${firstName} ${lastName}</p>
-          <p><strong>Age:</strong> ${age}</p>
+          
+          <div style="background-color: #f7fafc; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+            <p style="font-size: 18px; font-weight: bold; margin: 0;">${childName}</p>
+            <p style="margin: 5px 0 0 0; color: #718096;">${age} Years • ${gender}</p>
+          </div>
+
+          <h3 style="border-bottom: 1px solid #edf2f7; padding-bottom: 10px;">Parent/Contact Details</h3>
+          <p><strong>Parent Name:</strong> ${firstName} ${lastName}</p>
           <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
           <p><strong>Phone:</strong> ${phone}</p>
           <p><strong>Post Code:</strong> ${postCode}</p>
