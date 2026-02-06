@@ -36,6 +36,9 @@ export function ApplicationForm() {
         formState: { errors, isSubmitting },
     } = useForm<FormValues>({
         resolver: zodResolver(formSchema),
+        defaultValues: {
+            age: "3"
+        }
     })
 
     // Basic Input Masking Logic
