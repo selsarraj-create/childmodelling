@@ -24,9 +24,11 @@ export const MetaPixel = () => {
         <div>
             <Script
                 id="fb-pixel"
-                src="/scripts/pixel.js"
                 strategy="afterInteractive"
-                onLoad={() => setLoaded(true)}
+                onLoad={() => {
+                    setLoaded(true)
+                    console.log("Meta Pixel Script Loaded")
+                }}
                 dangerouslySetInnerHTML={{
                     __html: `
             !function(f,b,e,v,n,t,s)

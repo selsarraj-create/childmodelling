@@ -21,6 +21,8 @@ import Script from "next/script";
 
 // ... imports ...
 
+import { MetaPixel } from "@/components/MetaPixel";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -31,6 +33,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <MetaPixel />
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-TKZLK55"
