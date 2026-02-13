@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { format } from 'date-fns'
-import { Search, Calendar, ChevronDown, CheckCircle, XCircle, Clock } from 'lucide-react'
+import { Search, Calendar, ChevronDown, CheckCircle, XCircle, Clock, Download } from 'lucide-react'
 import Image from 'next/image'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -132,6 +132,50 @@ export default function Dashboard() {
         setSelectedLeads(new Set()) // Clear selection
     }
 
+    // --- CSV Export Logic ---
+    const handleExportCSV = () => {
+        const leadsToExport = selectedLeads.size > 0
+            ? leads.filter(l => selectedLeads.has(l.id))
+            : leads
+
+        if (leadsToExport.length === 0) {
+            alert("No leads to export.")
+            return
+        }
+
+        const headers = ["ID", "Created At", "First Name", "Last Name", "Email", "Age", "Phone", "Post Code", "Status", "Image URL"]
+        const csvRows = [headers.join(',')]
+
+        for (const lead of leadsToExport) {
+            const values = [
+                lead.id,
+                lead.created_at,
+                lead.first_name,
+                lead.last_name,
+                lead.email,
+                lead.age,
+                lead.phone,
+                lead.post_code,
+                lead.status,
+                lead.image_url
+            ].map(val => {
+                const escaped = String(val ?? '').replace(/"/g, '""')
+                return `"${escaped}"`
+            })
+            csvRows.push(values.join(','))
+        }
+
+        const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' })
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.setAttribute('hidden', '')
+        a.setAttribute('href', url)
+        a.setAttribute('download', `leads_export_${format(new Date(), 'yyyy-MM-dd_HH-mm')}.csv`)
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+    }
+
     return (
         <div className="min-h-screen bg-gray-50 p-4 md:p-8 font-sans">
             <div className="max-w-7xl mx-auto space-y-8">
@@ -184,6 +228,10 @@ export default function Dashboard() {
                                 onChange={(e) => setDateTo(e.target.value)}
                             />
                         </div>
+                        <Button onClick={handleExportCSV} variant="outline" className="h-full gap-2 hidden md:flex">
+                            <Download className="w-4 h-4" />
+                            Export CSV
+                        </Button>
                         <Button onClick={fetchLeads} variant="outline" className="h-full">Refresh</Button>
                     </div>
                 </div>
