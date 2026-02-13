@@ -41,7 +41,7 @@ export function ApplicationForm() {
     } = useForm<FormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            age: "3",
+            age: "4",
             gender: ""
         }
     })
@@ -361,7 +361,7 @@ export function ApplicationForm() {
                             >
                                 <option value="" disabled>Age</option>
                                 {/* Ages 3 to 17 */}
-                                {Array.from({ length: 15 }, (_, i) => i + 3).map((age) => (
+                                {Array.from({ length: 14 }, (_, i) => i + 4).map((age) => (
                                     <option key={age} value={age}>{age} Years</option>
                                 ))}
                             </select>
