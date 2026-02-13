@@ -211,7 +211,7 @@ export function ApplicationForm() {
             if (typeof window !== 'undefined') {
                 (window as any).dataLayer = (window as any).dataLayer || [];
                 (window as any).dataLayer.push({
-                    'event': 'form_submission',
+                    'event': 'lead_form_submit',
                     'form_name': 'application_form',
                     'status': 'success'
                 });
