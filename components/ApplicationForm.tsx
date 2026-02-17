@@ -213,7 +213,14 @@ export function ApplicationForm() {
                 (window as any).dataLayer.push({
                     'event': 'lead_form_submit',
                     'form_name': 'application_form',
-                    'status': 'success'
+                    'status': 'success',
+                    'enhanced_conversion_data': {
+                        'email': data.email,
+                        'phone_number': data.phone,
+                        'first_name': data.firstName,
+                        'last_name': data.lastName,
+                        'postal_code': data.postCode
+                    }
                 });
             }
 
@@ -406,6 +413,8 @@ export function ApplicationForm() {
                     />
                     {errors.image && <p className="ml-1 text-xs font-bold text-red-500">{errors.image.message}</p>}
                 </div>
+
+                <p className="text-center text-xs text-gray-400 font-medium">Tiny Talent Are Not An Agency</p>
 
                 {/* Submit Button */}
                 <div className="pt-2">
